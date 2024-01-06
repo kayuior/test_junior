@@ -1,40 +1,46 @@
+import datetime
+import os
+
 import pandas as pd
 
 
 class ETL:
-    def __init__(self, extract_path, transform_func, load_path):
-        self.extract_path = extract_path
-        self.transform_func = transform_func
-        self.load_path = load_path
+    INPUT_PATH = "./StackOverflow"
+    OUTPUT_PATH = "Output"
+
+    def __init__(self, value_date: datetime.date):
+        self.year = value_date.year
+        self.month = value_date.month
+
+        self.summary_table = dict()
 
     def extract(self):
-        try:
-            # Perform the extraction from the specified path
-            data = pd.read_csv(self.extract_path)
-            return data
-        except Exception as e:
-            print("Extraction error:", str(e))
-            return None
+        self.posts_df = pd.read_csv(
+            f"{self.INPUT_PATH}/{self.year}/{self.month:02d}/posts.csv.gz",
+            compression="gzip",
+        )
+        self.users_df = pd.read_csv(
+            f"{self.INPUT_PATH}/{self.year}/{self.month:02d}/users.csv.gz",
+            compression="gzip",
+        )
 
-    def transform(self, data):
-        try:
-            # Apply the specified transformation function
-            transformed_data = self.transform_func(data)
-            return transformed_data
-        except Exception as e:
-            print("Transformation error:", str(e))
-            return None
+    def transform(self):
+        self.generate_summary_table()
 
-    def load(self, transformed_data):
-        try:
-            # Save the transformed data to the specified path
-            transformed_data.to_csv(self.load_path, index=False)
-            print("Data successfully loaded at", self.load_path)
-        except Exception as e:
-            print("Loading error:", str(e))
+    def load(self):
+        pass
+
+    def generate_summary_table(self):
+        self.summary_table["Number of posts in that month"] = self.posts_df.shape[0]
+        self.summary_table["Average number of comments per post"] = self.posts_df["comment_count"].mean()
+        self.summary_table["Average number of comments per post"] = 0
+        self.summary_table["Average number of comments per post"] = 0
+        self.summary_table["Average number of comments per post"] = 0
+        self.summary_table["Average number of comments per post"] = 0
+        self.summary_table["Average number of comments per post"] = 0
 
     def run(self):
-        self.extract
-        self.transform
-        self.load
+        self.extract()
+        self.transform()
+        self.load()
         return True
